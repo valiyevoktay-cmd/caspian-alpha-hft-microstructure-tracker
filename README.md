@@ -19,7 +19,7 @@
 ## 📑 Executive Summary
 Most retail indicators are **lagging**—they tell you what happened. **Caspian Alpha** is **leading**—it tells you what is *happening*.
 
-This engine bypasses traditional OHLC candles to analyze the **Limit Order Book (LOB)** in real-time. By reconstructing the L2 state of BTC/USDT at 100ms intervals, it identifies **"toxic" order flow**, **absorption**, and **informed momentum** before they manifest in price action. It transforms raw binary streams into institutional-grade alpha signals.
+This engine bypasses traditional OHLC candles to analyze the **Limit Order Book (LOB)** in real-time. By reconstructing the L2 state of BTC/USDT at 100ms intervals, it identifies **"toxic" order flow**, **absorption**, and **informed momentum** before they manifest in price action. Designed as a quantitative research tool, it transforms raw binary streams into institutional-grade alpha signals.
 
 ---
 
@@ -35,13 +35,13 @@ Where **$\Delta W_t$** (Bid-side impact) is calculated as:
 * **Volume Accumulation:** If $P^B_t = P^B_{t-1} \implies \Delta W_t = V^B_t - V^B_{t-1}$
 * **Liquidity Removal:** If $P^B_t < P^B_{t-1} \implies \Delta W_t = -V^B_{t-1}$
 
-> **Multi-Factor Alpha:** The system correlates **OFI** with **OBI (Order Book Imbalance)** across 20 depth levels and **Aggressive Trade Delta** to filter out spoofing and fake liquidity.
+> **Multi-Factor Alpha:** The system correlates **OFI** with **OBI (Order Book Imbalance)** across 20 depth levels and **Aggressive Trade Delta** to filter out spoofing and fake liquidity prevalent in crypto markets.
 
 ---
 
 ## 🚀 Key Engineering Features
 
-* **⚡ Async L2 Reconstruction:** Leverages `asyncio` and `WebSockets` to maintain a zero-latency local mirror of the exchange state. 
+* **⚡ Async L2 Reconstruction:** Leverages `asyncio` and `WebSockets` for low-latency stream processing, maintaining a local mirror of the exchange state optimized for quantitative research and signal generation.
 * **🧠 Intelligent Persistence:** Implements **Smart Batching**. High-frequency metrics are aggregated in-memory and committed to **SQLite** once per second using atomic writes to prevent I/O blocking.
 * **📉 Professional Visualization:** A dual-axis **Streamlit** dashboard using `Plotly Graph Objects`. Features **Normalized Relative Performance** mode for direct comparison of Price Change vs. Cumulative OFI/Trades.
 * **🛡️ Robust Connectivity:** Built-in exponential backoff reconnection logic to ensure 24/7 data ingestion even during network instability.
@@ -59,8 +59,6 @@ Where **$\Delta W_t$** (Bid-side impact) is calculated as:
 | **Visualization** | `Streamlit`, `Plotly` |
 
 ---
-
-
 
 📈 Live Insight Demo
 <img width="1861" height="915" alt="image (8)" src="https://github.com/user-attachments/assets/dc964658-624e-48fa-b444-0ab0dea72f1f" />
