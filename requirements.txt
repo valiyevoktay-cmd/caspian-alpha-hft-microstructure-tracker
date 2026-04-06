@@ -1,0 +1,4 @@
+websockets
+pandas
+streamlit
+plotly
