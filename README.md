@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🔱 CASPIAN ALPHA
+# CASPIAN ALPHA
 ### **High-Frequency Market Microstructure & Order Flow Engine**
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
