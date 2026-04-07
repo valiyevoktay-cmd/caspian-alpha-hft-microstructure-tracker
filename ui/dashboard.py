@@ -4,7 +4,7 @@ import sqlite3
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import time
-import numpy as np
+import os
 
 # Configure the Streamlit application layout
 st.set_page_config(
@@ -13,8 +13,12 @@ st.set_page_config(
     layout="wide"
 )
 
-DB_PATH: str = "ofi_data.db"
-LOOKBACK_SECONDS: int = 150 # Увеличили окно для лучшей наглядности тренда
+# Robust path resolution: Automatically find the database in the parent directory
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
+DB_PATH: str = os.path.join(PROJECT_ROOT, "ofi_data.db")
+
+LOOKBACK_SECONDS: int = 150  # Increased window for better trend visibility
 
 def load_and_transform_data(limit: int = LOOKBACK_SECONDS) -> pd.DataFrame:
     """
@@ -39,12 +43,12 @@ def load_and_transform_data(limit: int = LOOKBACK_SECONDS) -> pd.DataFrame:
                 df['cum_trades'] = df['trade_delta'].cumsum()
                 
                 # 4. Z-Score Scaling to Price Volatility
-                # Мы подгоняем масштаб потоков под масштаб цены для визуального сравнения
+                # Scaling order flows to match price variance for visual comparison
                 price_std = df['price_pct'].std() if df['price_pct'].std() != 0 else 1
                 
                 for col in ['cum_ofi', 'cum_trades']:
                     col_std = df[col].std() if df[col].std() != 0 else 1
-                    # Масштабируем поток так, чтобы его отклонение соответствовало отклонению цены
+                    # Scale flow so its deviation matches price deviation
                     df[f'{col}_norm'] = ((df[col] - df[col].mean()) / col_std) * price_std
                 
             return df
@@ -53,13 +57,13 @@ def load_and_transform_data(limit: int = LOOKBACK_SECONDS) -> pd.DataFrame:
 
 def render_dashboard() -> None:
     """Renders the professional 3-pane quantitative dashboard."""
-    st.title("Caspian Alpha- Market Microstructure Analytics (L2 + Trades)")
+    st.title("Caspian Alpha - Market Microstructure Analytics")
     st.markdown("**Instrument:** BTC/USDT | **Mode:** Normalized Relative Performance")
 
     df = load_and_transform_data()
 
     if df.empty:
-        st.warning("Waiting for data synchronization... Ensure backend.py is active.")
+        st.warning(f"Waiting for data synchronization... Ensure backend is active and writing to {DB_PATH}")
     else:
         # Create 3-row layout
         fig = make_subplots(
@@ -70,19 +74,16 @@ def render_dashboard() -> None:
         )
 
         # --- ROW 1: RELATIVE DYNAMICS (Normalized) ---
-        # Линия цены в %
         fig.add_trace(
             go.Scatter(x=df['datetime'], y=df['price_pct'], name="Price % Change",
                        line=dict(color='#AB63FA', width=3)),
             row=1, col=1
         )
-        # Линия пассивного потока (OFI)
         fig.add_trace(
             go.Scatter(x=df['datetime'], y=df['cum_ofi_norm'], name="Cum OFI (Normalized)",
                        line=dict(color='#FFA15A', width=2, dash='dot')),
             row=1, col=1
         )
-        # Линия агрессивного потока (Trades)
         fig.add_trace(
             go.Scatter(x=df['datetime'], y=df['cum_trades_norm'], name="Cum Trades (Normalized)",
                        line=dict(color='#00CC96', width=2, dash='dash')),
