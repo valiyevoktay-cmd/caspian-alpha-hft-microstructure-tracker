@@ -1,67 +1,135 @@
-<div align="center">
+# 🌊 Caspian Alpha: Market Microstructure & Order Flow Imbalance Engine
 
-# CASPIAN ALPHA
-### **High-Frequency Market Microstructure & Order Flow Engine**
+<p align="left">
+  <img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit" />
+  <img src="https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white" alt="Actions" />
+</p>
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Market: HFT](https://img.shields.io/badge/Market-HFT%20%2F%20Quant-FF6F61?style=for-the-badge)](https://en.wikipedia.org/wiki/High-frequency_trading)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![Binance API](https://img.shields.io/badge/Data-Binance%20L2-F3BA2F?style=for-the-badge&logo=binance&logoColor=black)](https://binance-docs.github.io/apidocs/spot/en/)
+📌 **Executive Summary**
+**Caspian Alpha** is an institutional-grade, event-driven quantitative research environment designed to analyze Level 2 (L2) market microstructure dynamics in real-time. Built with a focus on data engineering and econometric rigor, this pipeline ingests high-frequency WebSocket streams, calculates normalized liquidity anomalies, and executes empirical event studies on macroeconomic shocks.
 
-**"Trading is the physics of liquidity. Caspian Alpha is the lens."**
-
-[Explore Methodology](#-quantitative-methodology) • [Engineering Details](#-key-engineering-features) • [Quick Start](#-quick-start)
-
-</div>
+> *Academic & Engineering Disclaimer:* This project is strictly a Proof of Concept (PoC) for signal generation and statistical analysis. True zero-latency High-Frequency Trading (HFT) execution is fundamentally constrained by Python's Global Interpreter Lock (GIL) and garbage collector. As such, this engine models *research potential* and *alpha generation* rather than hardware-level execution.
 
 ---
 
-## 📑 Executive Summary
-Most retail indicators are **lagging**—they tell you what happened. **Caspian Alpha** is **leading**—it tells you what is *happening*.
-
-This engine bypasses traditional OHLC candles to analyze the **Limit Order Book (LOB)** in real-time. By reconstructing the L2 state of BTC/USDT at 100ms intervals, it identifies **"toxic" order flow**, **absorption**, and **informed momentum** before they manifest in price action. Designed as a quantitative research tool, it transforms raw binary streams into institutional-grade alpha signals.
-
----
-
-## 📊 Quantitative Methodology
-
-The core of the engine is the **Order Flow Imbalance ($OFI_t$)** based on the *Cont-Stoikov (2010)* framework. We track the net aggressive pressure by deconstructing liquidity changes at the Best Bid ($P^B, V^B$) and Best Ask ($P^A, V^A$).
-
-### **The Fundamental Equation**
-$$OFI_t = \Delta W_t - \Delta V_t$$
-
-Where **$\Delta W_t$** (Bid-side impact) is calculated as:
-* **Price Improvement:** If $P^B_t > P^B_{t-1} \implies \Delta W_t = V^B_t$
-* **Volume Accumulation:** If $P^B_t = P^B_{t-1} \implies \Delta W_t = V^B_t - V^B_{t-1}$
-* **Liquidity Removal:** If $P^B_t < P^B_{t-1} \implies \Delta W_t = -V^B_{t-1}$
-
-> **Multi-Factor Alpha:** The system correlates **OFI** with **OBI (Order Book Imbalance)** across 20 depth levels and **Aggressive Trade Delta** to filter out spoofing and fake liquidity prevalent in crypto markets.
+## 🎯 Key Differentiators (For Quant & Engineering Teams)
+* **Full-Stack Quant Architecture:** Bridges the gap between Data Engineering (asyncio, WebSockets, Docker, CI/CD) and Quantitative Research (OFI, Sharpe/Sortino ratios, Event Studies).
+* **Adverse Selection Modeling:** Moves beyond standard price action by empirically tracking "Liquidity Vacuums"—the exact moments market makers pull quotes prior to macro-shocks.
+* **Deterministic $\mathcal{O}(1)$ State Machine:** Implements a highly optimized local order book reconstruction, avoiding CPU-heavy deep rescans during high-volatility tick bursts.
 
 ---
 
-## 🚀 Key Engineering Features
+## 📈 Visual Analytics & UI Terminal
 
-* **⚡ Async L2 Reconstruction:** Leverages `asyncio` and `WebSockets` for low-latency stream processing, maintaining a local mirror of the exchange state optimized for quantitative research and signal generation.
-* **🧠 Intelligent Persistence:** Implements **Smart Batching**. High-frequency metrics are aggregated in-memory and committed to **SQLite** once per second using atomic writes to prevent I/O blocking.
-* **📉 Professional Visualization:** A dual-axis **Streamlit** dashboard using `Plotly Graph Objects`. Features **Normalized Relative Performance** mode for direct comparison of Price Change vs. Cumulative OFI/Trades.
-* **🛡️ Robust Connectivity:** Built-in exponential backoff reconnection logic to ensure 24/7 data ingestion even during network instability.
+<img width="1866" height="919" alt="image (16)" src="https://github.com/user-attachments/assets/689aeb14-098d-4e76-9fac-3b5745f4c1a4" />
+
+![Caspian Alpha Dashboard]
+
+The system includes a state-of-the-art Streamlit/Plotly dashboard for real-time visual inspection of the order book physics. 
+
+**Terminal Features:**
+* **Normalized Relative Performance:** Visualizes Z-scaled liquidity deltas versus price action to spot hidden divergences.
+* **Liquidity Vacuum Overlay:** Displays Top-10 Depth as a background area chart to visually track liquidity evaporation.
+* **Interactive Research Controls:** Features a `Live Market Data` toggle. Analysts can pause the live feed to freeze the state machine, allowing them to zoom, pan, and granularly investigate historical anomalies using Lookback Sliders.
+   
+---
+
+## 🧮 Mathematical Framework
+
+The core engine avoids moving averages or lagging price indicators, focusing entirely on the physics of the limit order book and the mechanics of liquidity consumption.
+
+### 1. Multi-Factor Liquidity Analysis
+Beyond raw price action, the engine tracks the interaction between different layers of liquidity to identify high-probability alpha signals:
+
+* **Order Flow Imbalance (OFI):** Measures the net pressure of passive liquidity provision and consumption at the best quotes.
+  $$OFI_t = \Delta W_t - \Delta V_t$$
+  Where $\Delta W_t$ (Bid-side impact) is explicitly calculated as:
+  * **Price Improvement:** If $P_t^B > P_{t-1}^B \implies \Delta W_t = V_t^B
+  * **Volume Accumulation:** If $P_t^B = P_{t-1}^B \implies \Delta W_t = V_t^B - V_{t-1}^B
+  * **Liquidity Removal:** If $P_t^B < P_{t-1}^B \implies \Delta W_t = -V_{t-1}^B
+  *(An equivalent symmetric logic is applied to the Ask-side $\Delta V_t$)*
+
+* **Order Book Imbalance (OBI):** A normalized measure of static liquidity depth at the best bid/ask levels, indicating immediate directional bias.
+  $$OBI_t = \frac{V_t^B - V_t^A}{V_t^B + V_t^A}$$
+
+* **Liquidity Depth Profile:** Calculates the total aggregate volume in the top $K=10$ levels of the book using an $\mathcal{O}(K \log K)$ heap structure to monitor institutional risk appetite.
+
+### 2. Statistical Normalization (Z-Score)
+To filter out background market noise and identify statistically significant spoofing or liquidity absorption events, the raw OFI is standardized over a rolling intraday window:
+$$Z_{OFI} = \frac{OFI_t - \mu_{OFI}}{\sigma_{OFI}}$$
+Signals where $|Z| > 3.0$ are flagged as extreme microstructural anomalies.
+
+### 3. Risk-Adjusted Performance Metrics
+The integrated backtester strictly enforces institutional market frictions, applying asymmetric fee structures. Strategy viability is evaluated using core risk metrics:
+
+* **Sharpe Ratio:** Measures the excess return per unit of total risk.
+  $$Sharpe = \frac{R_p - R_f}{\sigma_p}$$
+* **Sortino Ratio:** Focuses on downside risk by differentiating harmful volatility from total overall volatility.
+  $$Sortino = \frac{R_p - R_f}{\sigma_d}$$
 
 ---
 
-## 🛠 Tech Stack
+## 🔬 Event-Driven Macro Research (Liquidity Vacuum)
 
-| Category | Technology |
+Caspian Alpha includes a dedicated research slicer (`run_research.py`) designed to empirically prove microstructural theories, specifically the **Liquidity Vacuum effect** during macroeconomic shocks (e.g., US CPI, FOMC).
+
+<img width="1403" height="240" alt="image (15)" src="https://github.com/user-attachments/assets/444c8a2f-beb3-4062-a43d-49a48e1fb4b5" />
+
+> *Empirical Proof: The engine successfully slicing event windows and detecting a 25.6% drop in Top-10 book depth just 30 seconds before a simulated CPI shock.*
+
+By injecting timestamped macro-events into the database, the `EventStudySlicer` algorithm:
+1. Slices a **baseline window** (e.g., 5 minutes prior to T=0).
+2. Slices an **event horizon window** (e.g., 30 seconds before T=0).
+3. Calculates the exact percentage of **Liquidity Evaporation** as market makers pull quotes to avoid adverse selection (toxic flow) before the news breaks.
+   
+---
+
+## ⚙️ Architecture & Tech Stack
+
+| Category | Technology Used |
 | :--- | :--- |
 | **Language** | Python 3.10+ (Strictly Typed) |
 | **Concurrency** | `asyncio`, `websockets` |
-| **Analytics** | `Pandas`, `NumPy`, `SciPy` |
-| **Database** | `SQLite` (WAL Mode) |
-| **Visualization** | `Streamlit`, `Plotly` |
+| **Data & Math** | `pandas`, `numpy`, `scipy` |
+| **UI Dashboard** | `streamlit`, `plotly` |
+| **Persistence** | SQLite (WAL Mode) |
+| **DevOps** | Docker, GitHub Actions, `pytest` |
+
+**Project Structure:**
+* `core/`: Contains the asynchronous WebSocket ingester and the $\mathcal{O}(1)$ L2 Order Book state machine.
+* `ui/`: A Streamlit/Plotly dashboard for real-time visual inspection with history slicing.
+* `strategies/`: Event-driven historical simulation engines and macro-event slicers.
+* `database/`: Thread-safe SQLite buffer for high-frequency tick aggregation.
+* `run_research.py`: Execution script for liquidity vacuum and anomaly research.
 
 ---
 
-📈 Live Insight Demo
-<img width="1861" height="915" alt="image (8)" src="https://github.com/user-attachments/assets/dc964658-624e-48fa-b444-0ab0dea72f1f" />
+## 🚀 Quick Start (Dockerization)
 
-Signal Example: Observe how the Cumulative OFI (orange) drops significantly before the Price (purple) follows. This is the "Informed Flow" lead time captured by Caspian Alpha.
+The entire environment is containerized. You do not need to manage local Python environments or database dependencies.
 
+**1. Clone the repository:**
+```
+git clone [https://github.com/valiyevoktay-cmd/caspian-alpha-hft-microstructure-tracker.git](https://github.com/valiyevoktay-cmd/caspian-alpha-hft-microstructure-tracker.git)
+cd caspian-alpha-hft-microstructure-tracker
+```
+**2. Launch the containerized pipeline:**
+```
+docker compose up -d --build
+```
+**3. Access the Dashboard & Run Research:**
+UI Terminal: Navigate your browser to http://localhost:8501.
+
+Macro Simulation: To test the Liquidity Vacuum detector on live data, open a secondary terminal and run:
+```
+python run_research.py
+```
+To stop the background data ingestion daemon, run:
+```
+docker compose down
+```
+---
+**🧪 CI/CD & Testing**
+This project embraces DevOps best practices to ensure mathematical and operational integrity.Unit Testing (pytest): The tests/ directory contains localized tests that feed synthetic L2 snapshots into the engine to validate the determinism of the $\mathcal{O}(1)$ state machine and OFI mathematics.Run locally: pytest tests/ -vAutomated Pipelines: A GitHub Actions workflow is triggered on every push and pull_request. The pipeline spins up a clean Ubuntu container, installs dependencies, and executes the test suite.Regression Control: This automated process ensures that any architectural refactoring does not introduce regressions into the signal logic.
