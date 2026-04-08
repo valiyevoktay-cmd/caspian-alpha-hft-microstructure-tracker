@@ -5,6 +5,7 @@ def test_ofi_calculation_basic():
     """
     Tests the fundamental OFI (Order Flow Imbalance) math logic.
     Simulates a sequence of L2 order book updates and verifies the delta.
+    Updated to handle all 7 metrics from Caspian Alpha v3.0.
     """
     engine = OrderFlowEngine()
     
@@ -41,10 +42,13 @@ def test_ofi_calculation_basic():
     metrics = engine.aggregate_and_reset()
     assert metrics is not None, "Metrics should not be None after processing depth."
     
-    avg_mid, total_ofi, avg_obi, trade_delta, ofi_zscore = metrics
+    # --- FIX: Unpack all 7 values now returned by the engine ---
+    (avg_mid, total_ofi, avg_obi, trade_delta, 
+     ofi_zscore, avg_spread, avg_depth_10) = metrics
     
     # Total OFI is sum of Tick 1 (0.0) and Tick 2 (3.0)
     assert total_ofi == 3.0, f"Expected OFI 3.0, got {total_ofi}"
+    assert avg_spread > 0, "Spread should be positive in a healthy market simulation"
 
 
 def test_trade_delta_logic():
