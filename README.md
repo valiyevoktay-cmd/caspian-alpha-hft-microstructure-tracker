@@ -44,29 +44,37 @@ The core engine avoids moving averages or lagging price indicators, focusing ent
 Beyond raw price action, the engine tracks the interaction between different layers of liquidity to identify high-probability alpha signals:
 
 * **Order Flow Imbalance (OFI):** Measures the net pressure of passive liquidity provision and consumption at the best quotes.
+
   $$OFI_t = \Delta W_t - \Delta V_t$$
+
   Where $\Delta W_t$ (Bid-side impact) is explicitly calculated as:
-  * **Price Improvement:** If $P_t^B > P_{t-1}^B \implies \Delta W_t = V_t^B
-  * **Volume Accumulation:** If $P_t^B = P_{t-1}^B \implies \Delta W_t = V_t^B - V_{t-1}^B
-  * **Liquidity Removal:** If $P_t^B < P_{t-1}^B \implies \Delta W_t = -V_{t-1}^B
+  * **Price Improvement:** If $P_t^B > P_{t-1}^B \implies \Delta W_t = V_t^B$
+  * **Volume Accumulation:** If $P_t^B = P_{t-1}^B \implies \Delta W_t = V_t^B - V_{t-1}^B$
+  * **Liquidity Removal:** If $P_t^B < P_{t-1}^B \implies \Delta W_t = -V_{t-1}^B$
   *(An equivalent symmetric logic is applied to the Ask-side $\Delta V_t$)*
 
 * **Order Book Imbalance (OBI):** A normalized measure of static liquidity depth at the best bid/ask levels, indicating immediate directional bias.
+
   $$OBI_t = \frac{V_t^B - V_t^A}{V_t^B + V_t^A}$$
 
 * **Liquidity Depth Profile:** Calculates the total aggregate volume in the top $K=10$ levels of the book using an $\mathcal{O}(K \log K)$ heap structure to monitor institutional risk appetite.
 
 ### 2. Statistical Normalization (Z-Score)
 To filter out background market noise and identify statistically significant spoofing or liquidity absorption events, the raw OFI is standardized over a rolling intraday window:
+
 $$Z_{OFI} = \frac{OFI_t - \mu_{OFI}}{\sigma_{OFI}}$$
+
 Signals where $|Z| > 3.0$ are flagged as extreme microstructural anomalies.
 
 ### 3. Risk-Adjusted Performance Metrics
 The integrated backtester strictly enforces institutional market frictions, applying asymmetric fee structures. Strategy viability is evaluated using core risk metrics:
 
 * **Sharpe Ratio:** Measures the excess return per unit of total risk.
+
   $$Sharpe = \frac{R_p - R_f}{\sigma_p}$$
+
 * **Sortino Ratio:** Focuses on downside risk by differentiating harmful volatility from total overall volatility.
+
   $$Sortino = \frac{R_p - R_f}{\sigma_d}$$
 
 ---
@@ -74,6 +82,7 @@ The integrated backtester strictly enforces institutional market frictions, appl
 ## 🔬 Event-Driven Macro Research (Liquidity Vacuum)
 
 Caspian Alpha includes a dedicated research slicer (`run_research.py`) designed to empirically prove microstructural theories, specifically the **Liquidity Vacuum effect** during macroeconomic shocks (e.g., US CPI, FOMC).
+<img width="1792" height="317" alt="image" src="https://github.com/user-attachments/assets/ad0950c9-2282-409a-957a-027e0ba92542" />
 
 <img width="1403" height="240" alt="image (15)" src="https://github.com/user-attachments/assets/444c8a2f-beb3-4062-a43d-49a48e1fb4b5" />
 
