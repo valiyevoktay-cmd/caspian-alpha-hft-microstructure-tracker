@@ -24,12 +24,27 @@ class BinanceStreamer:
             metrics = self.engine.aggregate_and_reset()
             
             if metrics:
-                avg_mid, total_ofi, avg_obi, trade_delta, ofi_zscore = metrics
+                # Распаковываем все 7 метрик из обновленного движка
+                avg_mid, total_ofi, avg_obi, trade_delta, ofi_zscore, avg_spread, avg_depth_10 = metrics
                 
-                # Route all 5 metrics to the database
-                self.db.insert_metrics(self.current_second, avg_mid, total_ofi, avg_obi, trade_delta, ofi_zscore)
+                # Отправляем в базу данных
+                self.db.insert_metrics(
+                    self.current_second, 
+                    avg_mid, 
+                    total_ofi, 
+                    avg_obi, 
+                    trade_delta, 
+                    ofi_zscore,
+                    avg_spread,      # НОВОЕ
+                    avg_depth_10     # НОВОЕ
+                )
                 
-                logging.info(f"DB Flush | Mid: {avg_mid:.2f} | Z-Score: {ofi_zscore:>5.2f} | OBI: {avg_obi:.3f} | Trades: {trade_delta:.2f}")
+                # Обновляем логгер, чтобы видеть вакуум ликвидности в терминале
+                logging.info(
+                    f"DB Flush | Mid: {avg_mid:.2f} | Z: {ofi_zscore:>5.2f} | "
+                    f"OBI: {avg_obi:.3f} | Trd: {trade_delta:.2f} | "
+                    f"Sprd: {avg_spread:.2f} | Dep10: {avg_depth_10:.2f}"
+                )
             
             self.current_second = now
 
