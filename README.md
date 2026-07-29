@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" />
 </p>
 
-> An institutional-grade, event-driven quantitative research environment for real-time Level 2 (L2) market microstructure analysis. Ingests high-frequency WebSocket streams, calculates normalized liquidity anomalies (OFI/OBI/Z-score), and executes empirical event studies on macroeconomic shocks.
+> An event-driven quantitative research environment for real-time Level 2 (L2) market microstructure analysis. Ingests high-frequency WebSocket streams, calculates normalized liquidity anomalies (OFI/OBI/Z-score), and executes empirical event studies on macroeconomic shocks.
 
 > **Academic Disclaimer:** This is a Proof of Concept for signal generation and statistical analysis. True zero-latency HFT execution is constrained by Python's GIL. This engine models *research potential* and *alpha generation*, not hardware-level execution.
 
